@@ -15,7 +15,7 @@ def Juego(Pantalla):
 	Limpiar_Nivel(jugador_uno, jugador_dos)
 	Inicio_Juego(Pantalla, reloj)
 	tamano = Crear_Nivel(jugador_uno.nivel)
-	camara = Camara(Pantalla, jugador_uno.rect, tamano[1]*25, tamano[0]*25)
+	camara = Camara(Pantalla, jugador_uno.rect, jugador_dos.rect, tamano[1]*25, tamano[0]*25)
 	sonido_nivel.play(-1)
 	Pantalla.blit(Fondo, (0,0))
 
@@ -63,8 +63,8 @@ def Juego(Pantalla):
 			jugador_dos.movex = 0
 
 		Pantalla.blit(Fondo, (0,0))
+		camara.update(jugador_uno, jugador_dos)
 		ls_todos.update()
-		camara.update()
 		camara.dibujarSprites(Pantalla, ls_todos)
 		texto = font.render(str((jugador_uno.vida)/6), True, VERDE)
 		Pantalla.blit(texto,(30, 0))

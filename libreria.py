@@ -103,25 +103,64 @@ def RelRect(actor, camara):
 
 class Camara(object): 
 	
-	def __init__(self, pantalla, jugador, anchoNivel, largoNivel):
-		self.jugador = jugador
+	def __init__(self, pantalla, jugador_uno, jugador_dos, anchoNivel, largoNivel):
+		self.jugador_uno = jugador_uno
+		self.jugador_dos = jugador_dos
 		self.rect = pantalla.get_rect()
-		self.rect.center = self.jugador.center
+		self.rect.center = self.jugador_uno.center
 		self.mundo_rect = pygame.Rect(0, 0, anchoNivel, largoNivel)
+		self.jugador_centerx = (self.jugador_uno.centerx + self.jugador_dos.centerx)/2
+		self.jugador_centery = (self.jugador_uno.centery + self.jugador_dos.centery)/2
 
-	def update(self):
-	  if self.jugador.centerx > self.rect.centerx + 25:
-		  self.rect.centerx = self.jugador.centerx - 25
+
+	def update(self, jg_uno, jg_dos):
+		self.jugador_centerx = (self.jugador_uno.centerx + self.jugador_dos.centerx)/2
+		self.jugador_centery = (self.jugador_uno.centery + self.jugador_dos.centery)/2
+
+		if self.jugador_centerx > self.rect.centerx + 25:
+			  self.rect.centerx = self.jugador_centerx - 25
 		  
-	  if self.jugador.centerx < self.rect.centerx - 25:
-		  self.rect.centerx = self.jugador.centerx + 25
+		if self.jugador_centerx < self.rect.centerx - 25:
+			  self.rect.centerx = self.jugador_centerx + 25
 
-	  if self.jugador.centery > self.rect.centery + 25:
-		  self.rect.centery = self.jugador.centery - 25
+		if self.jugador_centery > self.rect.centery + 25:
+			  self.rect.centery = self.jugador_centery - 25
 
-	  if self.jugador.centery < self.rect.centery - 25:
-		  self.rect.centery = self.jugador.centery + 25
-	  self.rect.clamp_ip(self.mundo_rect)
+		if self.jugador_centery < self.rect.centery - 25:
+			self.rect.centery = self.jugador_centery + 25
+
+		if abs(self.jugador_uno.centerx - self.jugador_dos.centerx) > 613:
+			if self.jugador_uno.centerx > self.jugador_dos.centerx:
+				if jg_uno.movex > 0:
+					jg_uno.max_pared_der = True
+				else:
+					jg_uno.max_pared_der = False
+				
+				if jg_dos.movex < 0:
+					jg_dos.max_pared_der = True
+				else:
+					jg_dos.max_pared_der = False
+
+			if self.jugador_uno.centerx < self.jugador_dos.centerx:
+				if jg_uno.movex < 0:
+					jg_uno.max_pared_izq = True
+				else:
+					jg_uno.max_pared_izq = False
+
+				if jg_dos.movex > 0:
+					jg_dos.max_pared_der = True
+				else:
+					jg_dos.max_pared_der = False
+				
+		else:
+			jg_uno.max_pared_der = False
+			jg_uno.max_pared_izq = False
+			jg_dos.max_pared_der = False
+			jg_dos.max_pared_izq = False
+
+
+
+		self.rect.clamp_ip(self.mundo_rect)
 
 	def dibujarSprites(self, pantalla, sprites):
 		for s in sprites:
@@ -154,6 +193,8 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.avanzarDerecha = ['Jugador/D1.png' , 'Jugador/D3.png', 'Jugador/D4.png', 'Jugador/D5.png']
 		self.frame = 0
 		self.direccion = 0
+		self.max_pared_der = False
+		self.max_pared_izq = False
 
 	def mas_puntaje1(self):
 		self.puntaje += 100 
@@ -200,7 +241,9 @@ class Jugador_Uno(pygame.sprite.Sprite):
 					self.salto = True
 					self.movey -= self.saltar
 
-			self.rect.x += self.movex
+			if not self.max_pared_der and not self.max_pared_izq:
+				self.rect.x += self.movex
+
 			col_muro = pygame.sprite.spritecollide(self, ls_muros, False)
 			for muro in col_muro:
 				if self.movex > 0:
@@ -233,12 +276,12 @@ class Jugador_Uno(pygame.sprite.Sprite):
 					self.movey = 0
 
 class Muro(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('Images/Muro.png').convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/Muro.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
 
-    def update(self):
-        pass
+	def update(self):
+		pass
