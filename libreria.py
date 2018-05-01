@@ -150,8 +150,7 @@ class Camara(object):
 				if jg_dos.movex > 0:
 					jg_dos.max_pared_der = True
 				else:
-					jg_dos.max_pared_der = False
-				
+					jg_dos.max_pared_der = False			
 		else:
 			jg_uno.max_pared_der = False
 			jg_uno.max_pared_izq = False
@@ -171,7 +170,7 @@ class Camara(object):
 class Jugador_Uno(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load('Jugador/D.png').convert_alpha()
+		self.image = pygame.image.load('Jugador/1D.png').convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
@@ -189,8 +188,8 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.salto = False
 		self.saltar = 8
 		self.pausa = False
-		self.avanzarIzquierda = ['Jugador/I1.png' , 'Jugador/I3.png', 'Jugador/I4.png', 'Jugador/I5.png']
-		self.avanzarDerecha = ['Jugador/D1.png' , 'Jugador/D3.png', 'Jugador/D4.png', 'Jugador/D5.png']
+		self.avanzarIzquierda = ['Jugador/1I1.png' , 'Jugador/1I3.png', 'Jugador/1I4.png', 'Jugador/1I5.png']
+		self.avanzarDerecha = ['Jugador/1D1.png' , 'Jugador/1D3.png', 'Jugador/1D4.png', 'Jugador/1D5.png']
 		self.frame = 0
 		self.direccion = 0
 		self.max_pared_der = False
@@ -224,12 +223,121 @@ class Jugador_Uno(pygame.sprite.Sprite):
 				if self.movex != 0:
 					self.image = pygame.image.load(self.avanzarDerecha[int(self.frame/6)]).convert_alpha()
 				else:
-					self.image = pygame.image.load('Jugador/D.png').convert_alpha()
+					self.image = pygame.image.load('Jugador/1D.png').convert_alpha()
 			else:
 				if self.movex != 0:
 					self.image = pygame.image.load(self.avanzarIzquierda[int(self.frame/6)]).convert_alpha()
 				else:
-					self.image = pygame.image.load('Jugador/I.png').convert_alpha()
+					self.image = pygame.image.load('Jugador/1I.png').convert_alpha()
+
+			if self.frame == 18:
+				self.frame = 0
+			else:
+				self.frame += 1
+
+			if self.arriba:
+				if self.contacto:
+					self.salto = True
+					self.img_salto = True
+					self.movey -= self.saltar
+
+			if not self.max_pared_der and not self.max_pared_izq:
+				self.rect.x += self.movex
+
+			col_muro = pygame.sprite.spritecollide(self, ls_muros, False)
+			for muro in col_muro:
+				if self.movex > 0:
+					self.rect.right = muro.rect.left
+				if self.movex <0:
+					self.rect.left = muro.rect.right
+
+			if not self.contacto:
+				self.movey += 0.3
+				if self.movey > 10:
+					self.movey = 10
+				self.rect.top += self.movey
+
+			if self.salto: 
+				self.movey += 2
+				self.rect.top += self.movey
+				if self.contacto:
+					self.salto = False
+
+			self.contacto = False
+			self.rect.y += self.movey
+			if self.movey != 0:
+				col_muro = pygame.sprite.spritecollide(self, ls_muros, False)
+				for muro in col_muro:
+					if self.movey > 0:
+						self.rect.bottom = muro.rect.top
+						self.contacto = True
+						self.movey = 0
+					if self.movey < 0:
+						self.rect.top = muro.rect.bottom
+						self.movey = 0
+
+class Jugador_Dos(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Jugador/2D.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+		self.vida = 600
+		self.movex = 0
+		self.movey = 0
+		self.win = False
+		self.cant = 0
+		self.nivel = 1
+		self.puntaje = 0
+		self.direccion = 0
+		self.frame = 0
+		self.contacto = False
+		self.arriba = False
+		self.salto = False
+		self.saltar = 8
+		self.pausa = False
+		self.avanzarIzquierda = ['Jugador/2I1.png' , 'Jugador/2I3.png', 'Jugador/2I4.png', 'Jugador/2I5.png']
+		self.avanzarDerecha = ['Jugador/2D1.png' , 'Jugador/2D3.png', 'Jugador/2D4.png', 'Jugador/2D5.png']
+		self.frame = 0
+		self.direccion = 0
+		self.max_pared_der = False
+		self.max_pared_izq = False
+
+	def mas_puntaje1(self):
+		self.puntaje += 100 
+		self.puntaje += self.vida
+
+	def mas_puntaje2(self):
+		self.puntaje += 200
+		self.puntaje += self.vida
+
+
+	def puntaje_final(self):
+		self.puntaje += 500
+		self.puntaje += self.vida
+
+	def menos_puntaje(self):
+		self.puntaje -= 10
+
+	def ir_arriba(self):
+		self.arriba = True
+
+	def no_arriba(self):
+		self.arriba = False
+
+	def update(self):
+		if not self.pausa:
+			if self.direccion == 0:
+				if self.movex != 0:
+					self.image = pygame.image.load(self.avanzarDerecha[int(self.frame/6)]).convert_alpha()
+				else:
+					self.image = pygame.image.load('Jugador/2D.png').convert_alpha()
+			else:
+				if self.movex != 0:
+					self.image = pygame.image.load(self.avanzarIzquierda[int(self.frame/6)]).convert_alpha()
+				else:
+					self.image = pygame.image.load('Jugador/2I.png').convert_alpha()
 
 			if self.frame == 18:
 				self.frame = 0
@@ -274,6 +382,7 @@ class Jugador_Uno(pygame.sprite.Sprite):
 				if self.movey < 0:
 					self.rect.top = muro.rect.bottom
 					self.movey = 0
+
 
 class Muro(pygame.sprite.Sprite):
 	def __init__(self, x, y):
