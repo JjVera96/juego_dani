@@ -6,15 +6,15 @@ def Juego(Pantalla):
 	reloj = pygame.time.Clock()
 	Fondo = pygame.image.load('Images/Fondo.png').convert()
 	font = pygame.font.Font(None, 20)
-	jugador_uno = Jugador_Uno(50,0)
-	jugador_dos = Jugador_Dos(25,0)
+	jugador_uno = Jugador_Uno(50,931)
+	jugador_dos = Jugador_Dos(25,931)
 	ls_todos.add(jugador_uno)
 	ls_jugadores.add(jugador_uno)
 	ls_todos.add(jugador_dos)
 	ls_jugadores.add(jugador_dos)
 	Limpiar_Nivel(jugador_uno, jugador_dos)
 	Inicio_Juego(Pantalla, reloj)
-	tamano = Crear_Nivel(jugador_uno.nivel)
+	tamano = Crear_Nivel()
 	camara = Camara(Pantalla, jugador_uno.rect, jugador_dos.rect, tamano[1]*25, tamano[0]*25)
 	sonido_nivel.play(-1)
 	Pantalla.blit(Fondo, (0,0))
@@ -70,6 +70,20 @@ def Juego(Pantalla):
 		Pantalla.blit(texto,(30, 0))
 		pygame.display.flip()
 		reloj.tick(60)
+
+		col_estrellas_rojas = pygame.sprite.spritecollide(jugador_dos, ls_estrellas_rojas, True)
+		for es in col_estrellas_rojas:
+			jugador_dos.estrellas += 1
+			ls_estrellas_rojas.remove(es)
+			ls_todos.remove(es)
+		
+		col_estrellas_azules = pygame.sprite.spritecollide(jugador_uno, ls_estrellas_azules, True)
+		for es in col_estrellas_azules:
+			jugador_uno.estrellas += 1
+			ls_estrellas_azules.remove(es)
+			ls_todos.remove(es)
+
+		
 
 	sonido_nivel.stop()
 	pygame.mouse.set_visible(True)

@@ -8,6 +8,9 @@ ls_todos = pygame.sprite.Group()
 ls_muros = pygame.sprite.Group()
 ls_jugadores = pygame.sprite.Group()
 ls_enemigos = pygame.sprite.Group()
+ls_estrellas_rojas = pygame.sprite.Group()
+ls_estrellas_azules = pygame.sprite.Group()
+ls_enemigos = pygame.sprite.Group()
 sonido_ganar = pygame.mixer.Sound("Sonidos/Win.ogg")
 sonido_perder = pygame.mixer.Sound("Sonidos/Game_over.ogg")
 sonido_cargando = pygame.mixer.Sound("Sonidos/Loading.ogg")
@@ -21,7 +24,7 @@ VERDE = (0, 255, 0)
 AZUL = (0, 0, 255)
 
 #Funcion para crear nivel que devuelve el tamaño en filas y columnas del archivo
-def Crear_Nivel(nivel):
+def Crear_Nivel():
 	x = 0
 	y = 0
 	iterlen = lambda it: sum(1 for _ in it)
@@ -35,6 +38,14 @@ def Crear_Nivel(nivel):
 				m = Muro(x,y)
 				ls_todos.add(m)
 				ls_muros.add(m)
+			if Columna == 'A':
+				e = Estrella_Azul(x,y)
+				ls_todos.add(e)
+				ls_estrellas_azules.add(e)
+			if Columna == 'R':
+				e = Estrella_Roja(x,y)
+				ls_todos.add(e)
+				ls_estrellas_rojas.add(e)
 			x += 25
 		y += 25
 		x = 0
@@ -45,6 +56,8 @@ def Limpiar_Nivel(jugador_uno, jugador_dos):
 	ls_todos.empty()
 	ls_muros.empty()
 	ls_enemigos.empty()
+	ls_estrellas_azules.empty()
+	ls_estrellas_rojas.empty()
 	ls_todos.add(jugador_uno)
 	ls_todos.add(jugador_dos)
 	jugador_uno.movex = 0
@@ -174,13 +187,11 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
-		self.vida = 600
+		self.vida = 1000
 		self.movex = 0
 		self.movey = 0
 		self.win = False
-		self.cant = 0
-		self.nivel = 1
-		self.puntaje = 0
+		self.estrellas = 0
 		self.direccion = 0
 		self.frame = 0
 		self.contacto = False
@@ -194,22 +205,6 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.direccion = 0
 		self.max_pared_der = False
 		self.max_pared_izq = False
-
-	def mas_puntaje1(self):
-		self.puntaje += 100 
-		self.puntaje += self.vida
-
-	def mas_puntaje2(self):
-		self.puntaje += 200
-		self.puntaje += self.vida
-
-
-	def puntaje_final(self):
-		self.puntaje += 500
-		self.puntaje += self.vida
-
-	def menos_puntaje(self):
-		self.puntaje -= 10
 
 	def ir_arriba(self):
 		self.arriba = True
@@ -283,13 +278,11 @@ class Jugador_Dos(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
-		self.vida = 600
+		self.vida = 1000
 		self.movex = 0
 		self.movey = 0
 		self.win = False
-		self.cant = 0
-		self.nivel = 1
-		self.puntaje = 0
+		self.estrellas = 0
 		self.direccion = 0
 		self.frame = 0
 		self.contacto = False
@@ -303,22 +296,6 @@ class Jugador_Dos(pygame.sprite.Sprite):
 		self.direccion = 0
 		self.max_pared_der = False
 		self.max_pared_izq = False
-
-	def mas_puntaje1(self):
-		self.puntaje += 100 
-		self.puntaje += self.vida
-
-	def mas_puntaje2(self):
-		self.puntaje += 200
-		self.puntaje += self.vida
-
-
-	def puntaje_final(self):
-		self.puntaje += 500
-		self.puntaje += self.vida
-
-	def menos_puntaje(self):
-		self.puntaje -= 10
 
 	def ir_arriba(self):
 		self.arriba = True
@@ -394,3 +371,25 @@ class Muro(pygame.sprite.Sprite):
 
 	def update(self):
 		pass
+
+class Estrella_Roja(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('Images/EstrellaR.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        pass
+
+class Estrella_Azul(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('Images/EstrellaA.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        pass
