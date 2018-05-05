@@ -1,7 +1,9 @@
+# -*- coding: cp1252 -*-
 from juego import *
 
 def main():
 	Pantalla = pygame.display.set_mode([ANCHO, ALTO])
+	pygame.display.set_caption("Mi Juego")
 	terminar = False
 	Menu = pygame.font.Font(None, 60)
 	Menu.set_bold(True)

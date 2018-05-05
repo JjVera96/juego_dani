@@ -11,6 +11,8 @@ ls_enemigos = pygame.sprite.Group()
 ls_estrellas_rojas = pygame.sprite.Group()
 ls_estrellas_azules = pygame.sprite.Group()
 ls_enemigos = pygame.sprite.Group()
+ls_puertas = pygame.sprite.Group()
+ls_copas = pygame.sprite.Group()
 sonido_ganar = pygame.mixer.Sound("Sonidos/Win.ogg")
 sonido_perder = pygame.mixer.Sound("Sonidos/Game_over.ogg")
 sonido_cargando = pygame.mixer.Sound("Sonidos/Loading.ogg")
@@ -38,14 +40,29 @@ def Crear_Nivel():
 				m = Muro(x,y)
 				ls_todos.add(m)
 				ls_muros.add(m)
+			if Columna == 'P':
+				p = Puerta(x,y)
+				ls_todos.add(p)
+				ls_puertas.add(p)
+				ls_muros.add(p)
 			if Columna == 'A':
-				e = Estrella_Azul(x,y)
-				ls_todos.add(e)
-				ls_estrellas_azules.add(e)
+				a = Estrella_Azul(x,y)
+				ls_todos.add(a)
+				ls_estrellas_azules.add(a)
 			if Columna == 'R':
-				e = Estrella_Roja(x,y)
+				r = Estrella_Roja(x,y)
+				ls_todos.add(r)
+				ls_estrellas_rojas.add(r)
+			if Columna == 'E':
+				e = Enemigo_Uno(x,y)
 				ls_todos.add(e)
-				ls_estrellas_rojas.add(e)
+			if Columna == 'Z':
+				z = Enemigo_Dos(x,y)
+				ls_todos.add(z)
+			if Columna == 'C':
+				c = Copa(x,y)
+				ls_todos.add(c)
+				ls_copas.add(c)
 			x += 25
 		y += 25
 		x = 0
@@ -58,6 +75,8 @@ def Limpiar_Nivel(jugador_uno, jugador_dos):
 	ls_enemigos.empty()
 	ls_estrellas_azules.empty()
 	ls_estrellas_rojas.empty()
+	ls_puertas.empty()
+	ls_copas.empty()
 	ls_todos.add(jugador_uno)
 	ls_todos.add(jugador_dos)
 	jugador_uno.movex = 0
@@ -67,7 +86,7 @@ def Limpiar_Nivel(jugador_uno, jugador_dos):
 
 #Funcion para pantalla de inicio del juego
 def Inicio_Juego(Pantalla, reloj):
-	sonido_cargando.play()
+	sonido_cargando.play(-1)
 	Cargando = 0
 	time = 1
 	font = pygame.font.Font(None, 80)
@@ -174,7 +193,8 @@ class Camara(object):
 
 		self.rect.clamp_ip(self.mundo_rect)
 
-	def dibujarSprites(self, pantalla, sprites):
+	def dibujarSprites(self, pantalla, fondo,sprites):
+		pantalla.blit(fondo.image, RelRect(fondo, self))
 		for s in sprites:
 			if s.rect.colliderect(self.rect):
 				pantalla.blit(s.image, RelRect(s, self))
@@ -198,7 +218,6 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.arriba = False
 		self.salto = False
 		self.saltar = 8
-		self.pausa = False
 		self.avanzarIzquierda = ['Jugador/1I1.png' , 'Jugador/1I3.png', 'Jugador/1I4.png', 'Jugador/1I5.png']
 		self.avanzarDerecha = ['Jugador/1D1.png' , 'Jugador/1D3.png', 'Jugador/1D4.png', 'Jugador/1D5.png']
 		self.frame = 0
@@ -213,7 +232,7 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.arriba = False
 
 	def update(self):
-		if not self.pausa:
+		if not self.win:
 			if self.direccion == 0:
 				if self.movex != 0:
 					self.image = pygame.image.load(self.avanzarDerecha[int(self.frame/6)]).convert_alpha()
@@ -270,6 +289,9 @@ class Jugador_Uno(pygame.sprite.Sprite):
 					if self.movey < 0:
 						self.rect.top = muro.rect.bottom
 						self.movey = 0
+		else:
+			self.image = pygame.image.load('Jugador/1Win.png').convert_alpha()
+
 
 class Jugador_Dos(pygame.sprite.Sprite):
 	def __init__(self, x, y):
@@ -289,7 +311,6 @@ class Jugador_Dos(pygame.sprite.Sprite):
 		self.arriba = False
 		self.salto = False
 		self.saltar = 8
-		self.pausa = False
 		self.avanzarIzquierda = ['Jugador/2I1.png' , 'Jugador/2I3.png', 'Jugador/2I4.png', 'Jugador/2I5.png']
 		self.avanzarDerecha = ['Jugador/2D1.png' , 'Jugador/2D3.png', 'Jugador/2D4.png', 'Jugador/2D5.png']
 		self.frame = 0
@@ -297,14 +318,8 @@ class Jugador_Dos(pygame.sprite.Sprite):
 		self.max_pared_der = False
 		self.max_pared_izq = False
 
-	def ir_arriba(self):
-		self.arriba = True
-
-	def no_arriba(self):
-		self.arriba = False
-
 	def update(self):
-		if not self.pausa:
+		if not self.win:
 			if self.direccion == 0:
 				if self.movex != 0:
 					self.image = pygame.image.load(self.avanzarDerecha[int(self.frame/6)]).convert_alpha()
@@ -359,6 +374,8 @@ class Jugador_Dos(pygame.sprite.Sprite):
 				if self.movey < 0:
 					self.rect.top = muro.rect.bottom
 					self.movey = 0
+		else:
+			self.image = pygame.image.load('Jugador/2Win.png').convert_alpha()
 
 
 class Muro(pygame.sprite.Sprite):
@@ -372,24 +389,79 @@ class Muro(pygame.sprite.Sprite):
 	def update(self):
 		pass
 
-class Estrella_Roja(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('Images/EstrellaR.png').convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+class Puerta(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/Puerta.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
 
-    def update(self):
-        pass
+	def update(self):
+		pass
+
+class Copa(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/Copa.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self):
+		pass
+
+class Estrella_Roja(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/EstrellaR.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self):
+		pass
 
 class Estrella_Azul(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('Images/EstrellaA.png').convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/EstrellaA.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
 
-    def update(self):
-        pass
+	def update(self):
+		pass
+
+class Enemigo_Uno(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/Bola.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self):
+		pass
+
+class Enemigo_Dos(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/Bola.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self):
+		pass
+
+class Fondo(pygame.sprite.Sprite):
+	def __init__(self, Imagen):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load(Imagen).convert_alpha()
+		self.rect = self.image.get_rect()
+
+	def update(self, Pantalla, vx, vy):
+		pass
+		
+		
