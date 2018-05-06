@@ -6,14 +6,20 @@ def Juego(Pantalla):
 	reloj = pygame.time.Clock()
 	fondo = Fondo('Images/Fondo.png')
 	font = pygame.font.Font(None, 20)
+	mini_azul = pygame.image.load('Images/mini_ea.png').convert_alpha()
+	mini_roja = pygame.image.load('Images/mini_er.png').convert_alpha()
+
 
 	#jugador_uno = Jugador_Uno(25,931)
 	#jugador_dos = Jugador_Dos(50,931)
 
-	jugador_uno = Jugador_Uno(450,25)
-	jugador_dos = Jugador_Dos(425,25)
-	jugador_uno.estrellas = 2
-	jugador_dos.estrellas = 2
+	#jugador_uno = Jugador_Uno(450,25)
+	#jugador_dos = Jugador_Dos(425,25)
+	#jugador_uno.estrellas = 2
+	#jugador_dos.estrellas = 2
+
+	jugador_uno = Jugador_Uno(1650,931)
+	jugador_dos = Jugador_Dos(1625,931)
 
 	ls_todos.add(jugador_uno)
 	ls_jugadores.add(jugador_uno)
@@ -108,15 +114,22 @@ def Juego(Pantalla):
 			camara.dibujarSprites(Pantalla, fondo, ls_todos)
 			vida_uno = font.render(str((jugador_uno.vida)/10), True, AZUL)
 			vida_dos = font.render(str((jugador_dos.vida)/10), True, ROJO)
-			Pantalla.blit(vida_uno,(30, 30))
-			Pantalla.blit(vida_dos,(60, 30))
+			estrellas_uno = font.render("x{}".format(jugador_uno.estrellas), True, AZUL)
+			estrellas_dos = font.render("x{}".format(jugador_dos.estrellas), True, ROJO)
+			Pantalla.blit(vida_uno, [30, 30])
+			Pantalla.blit(mini_azul, [30, 50])
+			Pantalla.blit(estrellas_uno, [44, 50])
+			Pantalla.blit(vida_dos, [660, 30])
+			Pantalla.blit(mini_roja, [660, 50])
+			Pantalla.blit(estrellas_dos, [674, 50])
+
 			pygame.display.flip()
 			reloj.tick(60)
 
 		if jugador_uno.win and jugador_dos.win:
 			if not juego_win:
 				font_win = pygame.font.Font(None, 80)
-				winners = font_win.render("Ganadores", True, NEGRO)
+				winners = font_win.render("Ganadores", True, BLANCO)
 				Pantalla.blit(winners, [230, 110])
 				pygame.display.flip()
 				juego_win = True
