@@ -13,13 +13,13 @@ def Juego(Pantalla):
 	#jugador_uno = Jugador_Uno(25,931)
 	#jugador_dos = Jugador_Dos(50,931)
 
-	#jugador_uno = Jugador_Uno(450,25)
-	#jugador_dos = Jugador_Dos(425,25)
-	#jugador_uno.estrellas = 2
-	#jugador_dos.estrellas = 2
+	jugador_uno = Jugador_Uno(450,25)
+	jugador_dos = Jugador_Dos(425,25)
+	jugador_uno.estrellas = 2
+	jugador_dos.estrellas = 2
 
-	jugador_uno = Jugador_Uno(1650,931)
-	jugador_dos = Jugador_Dos(1625,931)
+	#jugador_uno = Jugador_Uno(1650,931)
+	#jugador_dos = Jugador_Dos(1625,931)
 
 	ls_todos.add(jugador_uno)
 	ls_jugadores.add(jugador_uno)
@@ -31,9 +31,10 @@ def Juego(Pantalla):
 	camara = Camara(Pantalla, jugador_uno.rect, jugador_dos.rect, tamano[1]*25, tamano[0]*25)
 	sonido_nivel.play(-1)
 	juego_win = False
-	Fin = False
+	fin = False
+	objetivo = 0
 
-	while Fin == False and jugador_uno.vida > 0 and jugador_dos.vida > 0:
+	while fin == False and jugador_uno.vida > 0 and jugador_dos.vida > 0:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
 				pygame.quit()
@@ -79,6 +80,7 @@ def Juego(Pantalla):
 
 		col_estrellas_rojas = pygame.sprite.spritecollide(jugador_dos, ls_estrellas_rojas, True)
 		for es in col_estrellas_rojas:
+			sonido_estrellas.play()
 			jugador_dos.estrellas += 1
 			ls_estrellas_rojas.remove(es)
 			ls_todos.remove(es)
@@ -88,17 +90,9 @@ def Juego(Pantalla):
 					ls_muros.remove(p)
 					ls_todos.remove(p)
 
-		col_copas = pygame.sprite.groupcollide(ls_jugadores, ls_copas, False, False)
-		for jg in col_copas:
-			jg.win = True
-			if jugador_uno.win and jugador_dos.win:
-				for c in ls_copas:
-					ls_copas.remove(c)
-					ls_todos.remove(c)
-
-
 		col_estrellas_azules = pygame.sprite.spritecollide(jugador_uno, ls_estrellas_azules, True)
 		for es in col_estrellas_azules:
+			sonido_estrellas.play()
 			jugador_uno.estrellas += 1
 			ls_estrellas_azules.remove(es)
 			ls_todos.remove(es)
@@ -107,6 +101,37 @@ def Juego(Pantalla):
 					ls_puertas.remove(p)
 					ls_muros.remove(p)
 					ls_todos.remove(p)
+
+		for e in ls_enemigos:
+			if e.disparar:
+				sonido_bala.play()
+				if objetivo:
+					b = Bala(e.rect, Direccion_Bala(jugador_uno, e))
+					objetivo += 1
+				else:
+					b = Bala(e.rect, Direccion_Bala(jugador_dos, e))
+					objetivo -= 1
+				ls_balas.add(b)
+				ls_todos.add(b)
+
+		col_be = pygame.sprite.groupcollide(ls_balas, ls_jugadores, True, False)
+		for bala in col_be:
+			col_be[bala][0].vida -= 100
+			ls_balas.remove(bala)
+			ls_todos.remove(bala)
+
+		col_bm = pygame.sprite.groupcollide(ls_balas, ls_muros, True, False)
+		for bm in col_bm:
+			ls_balas.remove(bm)
+			ls_todos.remove(bm)
+
+		col_copas = pygame.sprite.groupcollide(ls_jugadores, ls_copas, False, False)
+		for jg in col_copas:
+			jg.win = True
+			if jugador_uno.win and jugador_dos.win:
+				for c in ls_copas:
+					ls_copas.remove(c)
+					ls_todos.remove(c)
 
 		if not juego_win:
 			camara.update(jugador_uno, jugador_dos)
@@ -128,6 +153,7 @@ def Juego(Pantalla):
 
 		if jugador_uno.win and jugador_dos.win:
 			if not juego_win:
+				sonido_ganar.play()
 				font_win = pygame.font.Font(None, 80)
 				winners = font_win.render("Ganadores", True, BLANCO)
 				Pantalla.blit(winners, [230, 110])
@@ -135,7 +161,7 @@ def Juego(Pantalla):
 				juego_win = True
 			else:
 				pygame.time.wait(3000)
-				Fin = True
+				fin = True
 				
 	
 	sonido_nivel.stop()

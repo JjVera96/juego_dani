@@ -13,10 +13,14 @@ ls_estrellas_azules = pygame.sprite.Group()
 ls_enemigos = pygame.sprite.Group()
 ls_puertas = pygame.sprite.Group()
 ls_copas = pygame.sprite.Group()
+ls_balas = pygame.sprite.Group()
 sonido_ganar = pygame.mixer.Sound("Sonidos/Win.ogg")
 sonido_perder = pygame.mixer.Sound("Sonidos/Game_over.ogg")
 sonido_cargando = pygame.mixer.Sound("Sonidos/Loading.ogg")
 sonido_nivel = pygame.mixer.Sound("Sonidos/Level.ogg")
+sonido_estrellas = pygame.mixer.Sound("Sonidos/Coin.ogg")
+sonido_bala = pygame.mixer.Sound("Sonidos/Shot.ogg")
+pygame.mixer.music.set_volume(1)
 ANCHO = 700
 ALTO = 500
 BLANCO = (255, 255, 255)
@@ -53,11 +57,13 @@ def Crear_Nivel():
 				r = Estrella_Roja(x,y)
 				ls_todos.add(r)
 				ls_estrellas_rojas.add(r)
-			if Columna == 'E':
-				e = Enemigo_Uno(x,y)
-				ls_todos.add(e)
 			if Columna == 'Z':
+				e = Enemigo_Uno(x,y)
+				ls_enemigos.add(e)
+				ls_todos.add(e)
+			if Columna == 'E':
 				z = Enemigo_Dos(x,y)
+				ls_enemigos.add(z)
 				ls_todos.add(z)
 			if Columna == 'C':
 				c = Copa(x,y)
@@ -77,6 +83,8 @@ def Limpiar_Nivel(jugador_uno, jugador_dos):
 	ls_estrellas_rojas.empty()
 	ls_puertas.empty()
 	ls_copas.empty()
+	ls_enemigos.empty()
+	ls_balas.empty()
 	ls_todos.add(jugador_uno)
 	ls_todos.add(jugador_dos)
 	jugador_uno.movex = 0
@@ -218,8 +226,10 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.arriba = False
 		self.salto = False
 		self.saltar = 8
-		self.avanzarIzquierda = ['Jugador/1I1.png' , 'Jugador/1I3.png', 'Jugador/1I4.png', 'Jugador/1I5.png']
-		self.avanzarDerecha = ['Jugador/1D1.png' , 'Jugador/1D3.png', 'Jugador/1D4.png', 'Jugador/1D5.png']
+		self.avanzarIzquierda = ['Jugador/1I1.png' , 'Jugador/1I2.png', 'Jugador/1I3.png', 'Jugador/1I4.png', 'Jugador/1I5.png', 
+							'Jugador/1I6.png', 'Jugador/1I7.png', 'Jugador/1I8.png', 'Jugador/1I9.png', 'Jugador/1I10.png']
+		self.avanzarDerecha = ['Jugador/1D1.png' , 'Jugador/1D2.png', 'Jugador/1D3.png', 'Jugador/1D4.png', 'Jugador/1D5.png', 
+							'Jugador/1D6.png', 'Jugador/1D7.png', 'Jugador/1D8.png', 'Jugador/1D9.png', 'Jugador/1D10.png']
 		self.frame = 0
 		self.direccion = 0
 		self.max_pared_der = False
@@ -244,7 +254,7 @@ class Jugador_Uno(pygame.sprite.Sprite):
 				else:
 					self.image = pygame.image.load('Jugador/1I.png').convert_alpha()
 
-			if self.frame == 18:
+			if self.frame == 59:
 				self.frame = 0
 			else:
 				self.frame += 1
@@ -311,9 +321,10 @@ class Jugador_Dos(pygame.sprite.Sprite):
 		self.arriba = False
 		self.salto = False
 		self.saltar = 8
-		self.avanzarIzquierda = ['Jugador/2I1.png' , 'Jugador/2I3.png', 'Jugador/2I4.png', 'Jugador/2I5.png']
-		self.avanzarDerecha = ['Jugador/2D1.png' , 'Jugador/2D3.png', 'Jugador/2D4.png', 'Jugador/2D5.png']
-		self.frame = 0
+		self.avanzarIzquierda = ['Jugador/2I1.png' , 'Jugador/2I2.png', 'Jugador/2I3.png', 'Jugador/2I4.png', 'Jugador/2I5.png', 
+							'Jugador/2I6.png', 'Jugador/2I7.png', 'Jugador/2I8.png', 'Jugador/2I9.png', 'Jugador/2I10.png']
+		self.avanzarDerecha = ['Jugador/2D1.png' , 'Jugador/2D2.png', 'Jugador/2D3.png', 'Jugador/2D4.png', 'Jugador/2D5.png', 
+							'Jugador/2D6.png', 'Jugador/2D7.png', 'Jugador/2D8.png', 'Jugador/2D9.png', 'Jugador/2D10.png']
 		self.direccion = 0
 		self.max_pared_der = False
 		self.max_pared_izq = False
@@ -331,7 +342,7 @@ class Jugador_Dos(pygame.sprite.Sprite):
 				else:
 					self.image = pygame.image.load('Jugador/2I.png').convert_alpha()
 
-			if self.frame == 18:
+			if self.frame == 59:
 				self.frame = 0
 			else:
 				self.frame += 1
@@ -433,28 +444,6 @@ class Estrella_Azul(pygame.sprite.Sprite):
 	def update(self):
 		pass
 
-class Enemigo_Uno(pygame.sprite.Sprite):
-	def __init__(self, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load('Images/Bola.png').convert_alpha()
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-
-	def update(self):
-		pass
-
-class Enemigo_Dos(pygame.sprite.Sprite):
-	def __init__(self, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load('Images/Bola.png').convert_alpha()
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-
-	def update(self):
-		pass
-
 class Fondo(pygame.sprite.Sprite):
 	def __init__(self, Imagen):
 		pygame.sprite.Sprite.__init__(self)
@@ -463,5 +452,121 @@ class Fondo(pygame.sprite.Sprite):
 
 	def update(self, Pantalla, vx, vy):
 		pass
+
+class Enemigo_Uno(pygame.sprite.Sprite): 
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Enemigos/Enemigo_1.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y-5
+		self.dano = 0
+		self.disparar = False
+		self.recarga = 300
+
+	def update(self):
+		if self.recarga == 0:
+			self.disparar = True
+			self.recarga = 300
+		else:
+			self.recarga -= 1
+			self.disparar = False
+
+class Bala(pygame.sprite.Sprite):
+	def __init__(self, pos, tipo):
+		pygame.sprite.Sprite.__init__(self)
+		self.direccion = tipo
+		self.balas = ["Enemigos/Bala_Der.png", "Enemigos/Bala_Izq.png"]
+		self.image = pygame.image.load(self.balas[self.direccion]).convert_alpha()
+		self.rect = self.image.get_rect()
+		self.contador = 1
+		self.rect.y = pos[1]+10
+		if self.direccion:
+			self.rect.x = pos[0]+10
+		else:
+			self.rect.x = pos[0]-10
+
 		
 		
+	
+	def update(self):
+		if self.direccion == 0:
+			self.rect.x += 8
+		else:
+			self.rect.x -= 8
+
+def Direccion_Bala(jugador, enemigo):
+	if(jugador.rect.x - enemigo.rect.x > 0):
+		return 0
+	else:
+		return 1
+
+class Enemigo_Dos(pygame.sprite.Sprite): 
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.movey = 0
+		self.movex = 0
+		self.x = x
+		self.y = y
+		self.ciclo = False
+		self.contacto = False
+		self.salto = False
+		self.recarga = random.randrange(200, 400)
+		self.disparar = False
+		self.image = pygame.image.load('Enemigos/Enemigo_2_D1.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.topleft = [x, y]
+		self.frame = 0
+		self.direccion = "derecha"
+		self.dano = 20
+		self.disparar = False
+		self.avanzarDerecha = ['Enemigos/Enemigo_2_D1.png', 'Enemigos/Enemigo_2_D2.png', 'Enemigos/Enemigo_2_D3.png']
+		self.avanzarIzquierda = ['Enemigos/Enemigo_2_I1.png', 'Enemigos/Enemigo_2_I2.png', 'Enemigos/Enemigo_2_I3.png']
+
+	def update(self):
+		if self.direccion == "izquierda":
+			self.movex = -5
+			self.image = pygame.image.load(self.avanzarIzquierda[int(self.frame/6)]).convert_alpha()
+			
+		if self.direccion == "derecha":
+			self.movex = +5
+			self.image = pygame.image.load(self.avanzarDerecha[int(self.frame/6)]).convert_alpha()
+
+		if self.frame == 14:
+			self.frame = 0
+		else:
+			self.frame += 1
+
+		self.rect.x += self.movex
+		col_muro = pygame.sprite.spritecollide(self, ls_muros, False)
+		for muro in col_muro:
+			if self.movex > 0:
+				self.rect.right = muro.rect.left
+				self.direccion = "izquierda"
+			if self.movex <0:
+				self.rect.left = muro.rect.right
+				self.direccion = "derecha"
+
+		if not self.contacto:
+			self.movey += 0.3
+			if self.movey > 10:
+				self.movey = 10
+			self.rect.top += self.movey
+
+		if self.salto: 
+			self.movey += 2
+			self.rect.top += self.movey
+			if self.contacto:
+				self.salto = False
+
+		self.contacto = False
+		self.rect.y += self.movey
+		col_muro = pygame.sprite.spritecollide(self, ls_muros, False)
+		for muro in col_muro:
+			if self.movey > 0:
+				self.rect.bottom = muro.rect.top
+				self.contacto = True
+				self.movey = 0
+			if self.movey < 0:
+				self.rect.top = muro.rect.bottom
+				self.movey = 0
