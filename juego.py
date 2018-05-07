@@ -97,6 +97,10 @@ def Juego(Pantalla):
 			ls_estrellas_amarillas.remove(estrella)
 			ls_todos.remove(estrella)
 
+		col_jg_eg = pygame.sprite.groupcollide(ls_jugadores, ls_enemigos, False, False)
+		for jg in col_jg_eg:
+			jg.vida -= 30
+
 		col_estrellas_azules = pygame.sprite.spritecollide(jugador_uno, ls_estrellas_azules, True)
 		for es in col_estrellas_azules:
 			sonido_estrellas.play()

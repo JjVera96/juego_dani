@@ -16,8 +16,8 @@ X Z                                                      XXX                    
 XXX                                                    XXX                                                            X
 X                                                        X        X                              E                    X
 X Z                                                      X        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXX                                          XXX         X                                                          ARX
-X                                                        X                                                            X
+XXX                                          XXX         X                                                          R X
+X                                                        X                                                           AX
 X                                                      Z XXXX                                                         X
 X                                  XXX                 XXX                                                            X
 X                                                        X                                                            X

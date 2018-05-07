@@ -147,8 +147,7 @@ class Opcion:
 def RelRect(actor, camara):
 	return pygame.Rect(actor.rect.x-camara.rect.x, actor.rect.y-camara.rect.y, actor.rect.w, actor.rect.h)
 
-class Camara(object): 
-	
+class Camara(object): 	
 	def __init__(self, pantalla, jugador_uno, jugador_dos, anchoNivel, largoNivel):
 		self.jugador_uno = jugador_uno
 		self.jugador_dos = jugador_dos
@@ -203,8 +202,6 @@ class Camara(object):
 			jg_dos.max_pared_der = False
 			jg_dos.max_pared_izq = False
 
-
-
 		self.rect.clamp_ip(self.mundo_rect)
 
 	def dibujarSprites(self, pantalla, fondo,sprites):
@@ -240,12 +237,6 @@ class Jugador_Uno(pygame.sprite.Sprite):
 		self.direccion = 0
 		self.max_pared_der = False
 		self.max_pared_izq = False
-
-	def ir_arriba(self):
-		self.arriba = True
-
-	def no_arriba(self):
-		self.arriba = False
 
 	def update(self):
 		if not self.win:
@@ -503,9 +494,6 @@ class Bala(pygame.sprite.Sprite):
 		else:
 			self.rect.x = pos[0]-10
 
-		
-		
-	
 	def update(self):
 		if self.direccion == 0:
 			self.rect.x += 8
