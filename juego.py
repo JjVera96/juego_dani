@@ -90,6 +90,13 @@ def Juego(Pantalla):
 					ls_muros.remove(p)
 					ls_todos.remove(p)
 
+		col_estrellas = pygame.sprite.groupcollide(ls_estrellas_amarillas, ls_jugadores, True, False)
+		for estrella in col_estrellas:
+			if col_estrellas[estrella][0].vida < 1000:
+				col_estrellas[estrella][0].vida = 1000
+			ls_estrellas_amarillas.remove(estrella)
+			ls_todos.remove(estrella)
+
 		col_estrellas_azules = pygame.sprite.spritecollide(jugador_uno, ls_estrellas_azules, True)
 		for es in col_estrellas_azules:
 			sonido_estrellas.play()

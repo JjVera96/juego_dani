@@ -8,6 +8,7 @@ ls_todos = pygame.sprite.Group()
 ls_muros = pygame.sprite.Group()
 ls_jugadores = pygame.sprite.Group()
 ls_enemigos = pygame.sprite.Group()
+ls_estrellas_amarillas = pygame.sprite.Group()
 ls_estrellas_rojas = pygame.sprite.Group()
 ls_estrellas_azules = pygame.sprite.Group()
 ls_enemigos = pygame.sprite.Group()
@@ -57,6 +58,10 @@ def Crear_Nivel():
 				r = Estrella_Roja(x,y)
 				ls_todos.add(r)
 				ls_estrellas_rojas.add(r)
+			if Columna == 'V':
+				v = Estrella_Amarilla(x,y)
+				ls_todos.add(v)
+				ls_estrellas_amarillas.add(v)
 			if Columna == 'Z':
 				e = Enemigo_Uno(x,y)
 				ls_enemigos.add(e)
@@ -79,6 +84,7 @@ def Limpiar_Nivel(jugador_uno, jugador_dos):
 	ls_todos.empty()
 	ls_muros.empty()
 	ls_enemigos.empty()
+	ls_estrellas_amarillas.empty()
 	ls_estrellas_azules.empty()
 	ls_estrellas_rojas.empty()
 	ls_puertas.empty()
@@ -415,6 +421,17 @@ class Copa(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load('Images/Copa.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self):
+		pass
+
+class Estrella_Amarilla(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('Images/Estrella.png').convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
